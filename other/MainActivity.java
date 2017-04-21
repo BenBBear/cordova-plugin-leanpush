@@ -22,7 +22,7 @@ package <%PACKAGE_NAME%>;
 
 import android.content.ComponentName;
 import android.app.ActivityManager;
-import me.xyzhang.cordova.leanpush.LeanPush;
+import leancloud.cordova.leanpush.LeanPush;
 import android.os.Bundle;
 import org.apache.cordova.*;
 import java.util.List;
@@ -36,9 +36,6 @@ import android.content.Intent;
 
 public class MainActivity extends CordovaActivity
 {
-    
-
-    
     private void checkAndSend(final String where, final String status){
         Bundle extras = getIntent().getExtras();
         if (extras != null)	{
@@ -67,8 +64,6 @@ public class MainActivity extends CordovaActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        
-        
     }
 
 }

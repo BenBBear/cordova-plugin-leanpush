@@ -8,8 +8,20 @@
 /*!
   A class that defines a query that is used to query for AVObjects.
  */
-@class AVOperation;
+@class AVRequestOperation;
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface AVQuery : NSObject
+
+/*!
+ * Distance unit for query.
+ */
+typedef NS_ENUM(NSInteger, AVQueryDistanceUnit) {
+    AVQueryDistanceUnitMile = 1,
+    AVQueryDistanceUnitKilometer,
+    AVQueryDistanceUnitRadian
+};
 
 #pragma mark Query options
 
@@ -49,7 +61,7 @@
  *  @param cql CQL 字符串
  *  @return 查询结果
  */
-+ (AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql;
++ (nullable AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql;
 
 /*!
  *  使用 CQL 查询
@@ -57,7 +69,7 @@
  *  @param error 用于返回错误结果
  *  @return 查询结果
  */
-+ (AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql error:(NSError **)error;
++ (nullable AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql error:(NSError **)error;
 
 /*!
  *  使用 CQL 查询
@@ -66,7 +78,7 @@
  *  @param error 用于返回错误结果
  *  @return 查询结果
  */
-+ (AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql pvalues:(NSArray *)pvalues error:(NSError **)error;
++ (nullable AVCloudQueryResult *)doCloudQueryWithCQL:(NSString *)cql pvalues:(nullable NSArray *)pvalues error:(NSError **)error;
 
 /*!
  *  使用 CQL 异步查询
@@ -81,13 +93,13 @@
  *  @param pvalues 参数列表
  *  @param callback 查询结果回调
  */
-+ (void)doCloudQueryInBackgroundWithCQL:(NSString *)cql pvalues:(NSArray *)pvalues callback:(AVCloudQueryCallback)callback;
++ (void)doCloudQueryInBackgroundWithCQL:(NSString *)cql pvalues:(nullable NSArray *)pvalues callback:(AVCloudQueryCallback)callback;
 
 /*!
  Initializes the query with a class name.
  @param newClassName The class name.
  */
-- (id)initWithClassName:(NSString *)newClassName;
+- (instancetype)initWithClassName:(NSString *)newClassName;
 
 /*!
   The class name to query for
@@ -193,39 +205,73 @@
  a reference point.  Distance is calculated based on angular distance on a sphere.  Results will be sorted by distance
  from reference point.
  @param key The key to be constrained.
- @param geopoint The reference point.  A AVGeoPoint.
+ @param geoPoint The reference point.  A AVGeoPoint.
  */
-- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geopoint;
+- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geoPoint;
 
 /*!
  Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be near
  a reference point and within the maximum distance specified (in miles).  Distance is calculated based on
  a spherical coordinate system.  Results will be sorted by distance (nearest to farthest) from the reference point.
  @param key The key to be constrained.
- @param geopoint The reference point.  A AVGeoPoint.
+ @param geoPoint The reference point.  A AVGeoPoint.
  @param maxDistance Maximum distance in miles.
  */
-- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geopoint withinMiles:(double)maxDistance;
+- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geoPoint withinMiles:(double)maxDistance;
 
 /*!
  Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be near
  a reference point and within the maximum distance specified (in kilometers).  Distance is calculated based on
  a spherical coordinate system.  Results will be sorted by distance (nearest to farthest) from the reference point.
  @param key The key to be constrained.
- @param geopoint The reference point.  A AVGeoPoint.
+ @param geoPoint The reference point.  A AVGeoPoint.
  @param maxDistance Maximum distance in kilometers.
  */
-- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geopoint withinKilometers:(double)maxDistance;
+- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geoPoint withinKilometers:(double)maxDistance;
 
 /*!
  Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be near
  a reference point and within the maximum distance specified (in radians).  Distance is calculated based on
  angular distance on a sphere.  Results will be sorted by distance (nearest to farthest) from the reference point.
  @param key The key to be constrained.
- @param geopoint The reference point.  A AVGeoPoint.
+ @param geoPoint The reference point.  A AVGeoPoint.
  @param maxDistance Maximum distance in radians.
  */
-- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geopoint withinRadians:(double)maxDistance;
+- (void)whereKey:(NSString *)key nearGeoPoint:(AVGeoPoint *)geoPoint withinRadians:(double)maxDistance;
+
+/*!
+ * Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be near
+ * a reference point and within the maximum and minimum distance. Distance is calculated based on
+ * angular distance on a sphere. Results will be sorted by distance (nearest to farthest) from the reference point.
+ *
+ * @param key              The key to be constrained.
+ * @param geoPoint         The reference point, a AVGeoPoint.
+ * @param maxDistance      Maximum distance value. If negative (like -1), the maximum constraint will be ignored.
+ * @param maxDistanceUnit  Maximum distance unit.
+ * @param minDistance      Minimum distance value. If negative (like -1), the minimum constraint will be ignored.
+ * @param minDistanceUnit  Minimum distance unit.
+ */
+- (void)whereKey:(NSString *)key
+    nearGeoPoint:(AVGeoPoint *)geoPoint
+     maxDistance:(double)maxDistance
+ maxDistanceUnit:(AVQueryDistanceUnit)maxDistanceUnit
+     minDistance:(double)minDistance
+ minDistanceUnit:(AVQueryDistanceUnit)minDistanceUnit;
+
+/*!
+ * Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be near
+ * a reference point and within the minimum distance. Distance is calculated based on
+ * angular distance on a sphere. Results will be sorted by distance (nearest to farthest) from the reference point.
+ *
+ * @param key              The key to be constrained.
+ * @param geoPoint         The reference point, a AVGeoPoint.
+ * @param minDistance      Minimum distance value. If negative (like -1), the minimum constraint will be ignored.
+ * @param minDistanceUnit  Minimum distance unit.
+ */
+- (void)whereKey:(NSString *)key
+    nearGeoPoint:(AVGeoPoint *)geoPoint
+     minDistance:(double)minDistance
+ minDistanceUnit:(AVQueryDistanceUnit)minDistanceUnit;
 
 /*!
  Add a constraint to the query that requires a particular key's coordinates (specified via AVGeoPoint) be
@@ -253,7 +299,7 @@
  @param regex The regular expression pattern to match.
  @param modifiers Any of the following supported PCRE modifiers:<br><code>i</code> - Case insensitive search<br><code>m</code> - Search across multiple lines of input
  */
-- (void)whereKey:(NSString *)key matchesRegex:(NSString *)regex modifiers:(NSString *)modifiers;
+- (void)whereKey:(NSString *)key matchesRegex:(NSString *)regex modifiers:(nullable NSString *)modifiers;
 
 /*!
  Add a constraint for finding string values that contain a provided substring.
@@ -390,8 +436,8 @@
  @param objectId The id of the object that is being requested.
  @return The AVObject if found. Returns nil if the object isn't found, or if there was an error.
  */
-+ (AVObject *)getObjectOfClass:(NSString *)objectClass
-                      objectId:(NSString *)objectId;
++ (nullable AVObject *)getObjectOfClass:(NSString *)objectClass
+                               objectId:(NSString *)objectId;
 
 /*!
  Returns a AVObject with a given class and id and sets an error if necessary.
@@ -400,9 +446,9 @@
  @param error Pointer to an NSError that will be set if necessary.
  @return The AVObject if found. Returns nil if the object isn't found, or if there was an error.
  */
-+ (AVObject *)getObjectOfClass:(NSString *)objectClass
-                      objectId:(NSString *)objectId
-                         error:(NSError **)error;
++ (nullable AVObject *)getObjectOfClass:(NSString *)objectClass
+                               objectId:(NSString *)objectId
+                                  error:(NSError **)error;
 
 /*!
  Returns a AVObject with the given id.
@@ -412,7 +458,7 @@
  @param objectId The id of the object that is being requested.
  @return The AVObject if found. Returns nil if the object isn't found, or if there was an error.
  */
-- (AVObject *)getObjectWithId:(NSString *)objectId;
+- (nullable AVObject *)getObjectWithId:(NSString *)objectId;
 
 /*!
  Returns a AVObject with the given id and sets an error if necessary.
@@ -423,7 +469,7 @@
  @param error Pointer to an NSError that will be set if necessary.
  @return The AVObject if found. Returns nil if the object isn't found, or if there was an error.
  */
-- (AVObject *)getObjectWithId:(NSString *)objectId error:(NSError **)error;
+- (nullable AVObject *)getObjectWithId:(NSString *)objectId error:(NSError **)error;
 
 /*!
  Gets a AVObject asynchronously and calls the given block with the result. 
@@ -458,7 +504,7 @@
  @param objectId The id of the object that is being requested.
  @return The AVUser if found. Returns nil if the object isn't found, or if there was an error.
  */
-+ (AVUser *)getUserObjectWithId:(NSString *)objectId;
++ (nullable AVUser *)getUserObjectWithId:(NSString *)objectId;
 
 /*!
  Returns a AVUser with a given class and id and sets an error if necessary.
@@ -467,13 +513,13 @@
  @param error Pointer to an NSError that will be set if necessary.
  @return The AVUser if found. Returns nil if the object isn't found, or if there was an error.
  */
-+ (AVUser *)getUserObjectWithId:(NSString *)objectId
-                          error:(NSError **)error;
++ (nullable AVUser *)getUserObjectWithId:(NSString *)objectId
+                                   error:(NSError **)error;
 
 /*!
  Deprecated.  Please use [AVUser query] instead.
  */
-+ (AVQuery *)queryForUser __attribute__ ((deprecated));
++ (instancetype)queryForUser AV_DEPRECATED("Use +[AVUser query] instead.");
 
 #pragma mark -
 #pragma mark Find methods
@@ -484,14 +530,20 @@
  Finds objects based on the constructed query.
  @return an array of AVObjects that were found.
  */
-- (NSArray *)findObjects;
+- (nullable NSArray *)findObjects;
 
 /*!
  Finds objects based on the constructed query and sets an error if there was one.
  @param error Pointer to an NSError that will be set if necessary.
  @return an array of AVObjects that were found.
  */
-- (NSArray *)findObjects:(NSError **)error;
+- (nullable NSArray *)findObjects:(NSError **)error;
+
+/*!
+ An alias of `-[AVQuery findObjects:]` methods that supports Swift exception.
+ @seealso `-[AVQuery findObjects:]`
+ */
+- (nullable NSArray *)findObjectsAndThrowsWithError:(NSError **)error;
 
 /*!
  Finds objects asynchronously and calls the given block with the results.
@@ -523,7 +575,7 @@
  
  @return a AVObject, or nil if none was found.
  */
-- (AVObject *)getFirstObject;
+- (nullable AVObject *)getFirstObject;
 
 /*!
  Gets an object based on the constructed query and sets an error if any occurred.
@@ -533,7 +585,13 @@
  @param error Pointer to an NSError that will be set if necessary.
  @return a AVObject, or nil if none was found.
  */
-- (AVObject *)getFirstObject:(NSError **)error;
+- (nullable AVObject *)getFirstObject:(NSError **)error;
+
+/*!
+ An alias of `-[AVQuery getFirstObject:]` methods that supports Swift exception.
+ @seealso `-[AVQuery getFirstObject:]`
+ */
+- (nullable AVObject *)getFirstObjectAndThrowsWithError:(NSError **)error;
 
 /*!
  Gets an object asynchronously and calls the given block with the result.
@@ -573,6 +631,12 @@
 - (NSInteger)countObjects:(NSError **)error;
 
 /*!
+ An alias of `-[AVQuery countObjects:]` methods that supports Swift exception.
+ @seealso `-[AVQuery countObjects:]`
+ */
+- (NSInteger)countObjectsAndThrowsWithError:(NSError **)error;
+
+/*!
  Counts objects asynchronously and calls the given block with the counts.
  @param block The block to execute. The block should have the following argument signature:
  (int count, NSError *error) 
@@ -603,12 +667,12 @@
 /*!
  A limit on the number of objects to return.  Note: If you are calling findObject with limit=1, you may find it easier to use getFirst instead.
  */
-@property (nonatomic) NSInteger limit;
+@property (nonatomic, assign) NSInteger limit;
 
 /*!
  The number of objects to skip before returning any.
  */
-@property (nonatomic) NSInteger skip;
+@property (nonatomic, assign) NSInteger skip;
 
 #pragma mark -
 #pragma mark Cache methods
@@ -621,7 +685,7 @@
 @property (readwrite, assign) AVCachePolicy cachePolicy;
 
 /* !
- The age after which a cached value will be ignored
+ The age(seconds) after which a cached value will be ignored.
  */
 @property (readwrite, assign) NSTimeInterval maxCacheAge;
 
@@ -653,3 +717,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

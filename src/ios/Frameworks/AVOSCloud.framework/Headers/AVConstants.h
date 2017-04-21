@@ -2,30 +2,15 @@
 // Copyright 2013 AVOS, Inc. All rights reserved.
 
 #import <Foundation/Foundation.h>
+#import "AVAvailability.h"
+
 @class AVObject;
 @class AVUser;
 @class AVFile;
 
-//! Project version number for AVOSCloud.
-FOUNDATION_EXPORT double AVOSCloudVersionNumber;
-
-//! Project version string for AVOSCloud.
-FOUNDATION_EXPORT const unsigned char AVOSCloudVersionString[];
-
-// Version
-#define AVOSCLOUD_VERSION @"1.0.0"
-
-extern NSInteger const AVOSCLOUD_API_VERSION;
-
-// Platform
-#define PARSE_IOS_ONLY (TARGET_OS_IPHONE)
-#define PARSE_OSX_ONLY (TARGET_OS_MAC && !(TARGET_OS_IPHONE))
-
-extern NSString *const kPFDeviceType;
-
-#if PARSE_IOS_ONLY
+#if AV_IOS_ONLY
 #import <UIKit/UIKit.h>
-#else
+#elif AV_OSX_ONLY
 #import <Cocoa/Cocoa.h>
 @compatibility_alias UIImage NSImage;
 @compatibility_alias UIColor NSColor;
@@ -43,23 +28,23 @@ typedef enum : NSUInteger {
 #define kAVVerboseAuto kAVVerboseNone
 #endif
 /// Cache policies
-typedef NS_ENUM(int, AVCachePolicy){
-    ///Ignore Cache
+typedef NS_ENUM(int, AVCachePolicy) {
+    /// Query from server and do not save result to the local cache.
     kAVCachePolicyIgnoreCache = 0,
     
-    ///Cache Only
+    /// Only query from the local cache.
     kAVCachePolicyCacheOnly,
     
-    ///Network Only
+    /// Only query from server, and save result to the local cache.
     kAVCachePolicyNetworkOnly,
     
-    ///CacheElseNetwork
+    /// Firstly query from the local cache, if fails, query from server.
     kAVCachePolicyCacheElseNetwork,
     
-    ///NetworkElseCache
+    /// Firstly query from server, if fails, query the local cache.
     kAVCachePolicyNetworkElseCache,
     
-    ///CacheThenNetwork
+    /// Firstly query from the local cache, return result. Then query from server, return result. The callback will be called twice.
     kAVCachePolicyCacheThenNetwork,
 } ;
 
@@ -104,7 +89,7 @@ extern NSInteger const kAVErrorCacheMiss;
 extern NSInteger const kAVErrorInvalidNestedKey;
 /*! @abstract 122: Invalid file name. A file name contains only a-zA-Z0-9_. characters and is between 1 and 36 characters. */
 extern NSInteger const kAVErrorInvalidFileName;
-/*! @abstract 123: Invalid ACL. An ACL with an invalid format was saved. This should not happen if you use PFACL. */
+/*! @abstract 123: Invalid ACL. An ACL with an invalid format was saved. This should not happen if you use AVACL. */
 extern NSInteger const kAVErrorInvalidACL;
 /*! @abstract 124: The request timed out on the server. Typically this indicates the request is too expensive. */
 extern NSInteger const kAVErrorTimeout;
@@ -156,8 +141,6 @@ extern NSInteger const kAVErrorUserWithEmailNotFound;
 extern NSInteger const kAVErrorUserCannotBeAlteredWithoutSession;
 /*! @abstract 207: Users can only be created through sign up */
 extern NSInteger const kAVErrorUserCanOnlyBeCreatedThroughSignUp;
-/*! @abstract 208: An existing Facebook account already linked to another user. */
-extern NSInteger const kAVErrorFacebookAccountAlreadyLinked;
 /*! @abstract 208: An existing account already linked to another user. */
 extern NSInteger const kAVErrorAccountAlreadyLinked;
 /*! @abstract 209: User ID mismatch */
@@ -166,28 +149,32 @@ extern NSInteger const kAVErrorUserIdMismatch;
 extern NSInteger const kAVErrorUsernamePasswordMismatch;
 /*! @abstract 211: Could not find user. */
 extern NSInteger const kAVErrorUserNotFound;
-/*! @abstract 250: Facebook id missing from request */
-extern NSInteger const kAVErrorFacebookIdMissing;
+/*! @abstract 212: The mobile phone number is missing, and must be specified. */
+extern NSInteger const kAVErrorUserMobilePhoneMissing;
+/*! @abstract 213: An user with the specified mobile phone number was not found. */
+extern NSInteger const kAVErrorUserWithMobilePhoneNotFound;
+/*! @abstract 214: Mobile phone number has already been taken. */
+extern NSInteger const kAVErrorUserMobilePhoneNumberTaken;
+/*! @abstract 215: Mobile phone number isn't verified. */
+extern NSInteger const kAVErrorUserMobilePhoneNotVerified;
 /*! @abstract 250: Linked id missing from request */
 extern NSInteger const kAVErrorLinkedIdMissing;
-/*! @abstract 251: Invalid Facebook session */
-extern NSInteger const kAVErrorFacebookInvalidSession;
 /*! @abstract 251: Invalid linked session */
 extern NSInteger const kAVErrorInvalidLinkedSession;
 
-typedef void (^AVBooleanResultBlock)(BOOL succeeded, NSError *error);
-typedef void (^AVIntegerResultBlock)(NSInteger number, NSError *error);
-typedef void (^AVArrayResultBlock)(NSArray *objects, NSError *error);
-typedef void (^AVObjectResultBlock)(AVObject *object, NSError *error);
-typedef void (^AVSetResultBlock)(NSSet *channels, NSError *error);
-typedef void (^AVUserResultBlock)(AVUser *user, NSError *error);
-typedef void (^AVDataResultBlock)(NSData *data, NSError *error);
-typedef void (^AVImageResultBlock)(UIImage * image, NSError *error);
-typedef void (^AVDataStreamResultBlock)(NSInputStream *stream, NSError *error);
-typedef void (^AVStringResultBlock)(NSString *string, NSError *error);
-typedef void (^AVIdResultBlock)(id object, NSError *error);
+typedef void (^AVBooleanResultBlock)(BOOL succeeded,  NSError * _Nullable error);
+typedef void (^AVIntegerResultBlock)(NSInteger number, NSError * _Nullable error);
+typedef void (^AVArrayResultBlock)(NSArray * _Nullable objects, NSError * _Nullable error);
+typedef void (^AVObjectResultBlock)(AVObject * _Nullable object, NSError * _Nullable error);
+typedef void (^AVSetResultBlock)(NSSet * _Nullable channels, NSError * _Nullable error);
+typedef void (^AVUserResultBlock)(AVUser * _Nullable user, NSError * _Nullable error);
+typedef void (^AVDataResultBlock)(NSData * _Nullable data, NSError * _Nullable error);
+typedef void (^AVImageResultBlock)(UIImage * _Nullable image, NSError * _Nullable error);
+typedef void (^AVDataStreamResultBlock)(NSInputStream * _Nullable stream, NSError * _Nullable error);
+typedef void (^AVStringResultBlock)(NSString * _Nullable string, NSError * _Nullable error);
+typedef void (^AVIdResultBlock)(id _Nullable object, NSError * _Nullable error);
 typedef void (^AVProgressBlock)(NSInteger percentDone);
-typedef void (^AVFileResultBlock)(AVFile * file, NSError *error);
-typedef void (^AVDictionaryResultBlock)(NSDictionary * dict, NSError *error);
+typedef void (^AVFileResultBlock)(AVFile * _Nullable file, NSError * _Nullable error);
+typedef void (^AVDictionaryResultBlock)(NSDictionary * _Nullable dict, NSError * _Nullable error);
 
-#define AVDeprecated(explain) __attribute__((deprecated(explain)))
+#define AV_DEPRECATED(explain) __attribute__((deprecated(explain)))

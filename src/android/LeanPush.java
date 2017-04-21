@@ -1,4 +1,4 @@
-package me.xyzhang.cordova.leanpush;
+package leancloud.cordova.leanpush;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -80,10 +80,11 @@ public class LeanPush extends CordovaPlugin {
 
     private void getInstallation(final CallbackContext callbackContext) {
         String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
-        if (installationId == null) {
+        String objectId = AVInstallation.getCurrentInstallation().getObjectId();
+        if (objectId == null || installationId == null) {
             callbackContext.error("Fail to get Installation.");
         } else {
-            callbackContext.success("android," + installationId);
+            callbackContext.success("android," + objectId +","+installationId);
         }
     }
 
@@ -131,6 +132,6 @@ public class LeanPush extends CordovaPlugin {
     }
 
     private void getCacheResult(final CallbackContext callbackContext){
-    callbackContext.success(cacheResult);
+        callbackContext.success(cacheResult);
     }
 }

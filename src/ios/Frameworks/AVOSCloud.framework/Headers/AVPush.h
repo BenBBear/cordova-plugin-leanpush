@@ -1,12 +1,13 @@
 //
 //  AVPush.h
-//  AVOS Cloud
+//  LeanCloud
 //
 
 #import <Foundation/Foundation.h>
-#import <AudioToolbox/AudioToolbox.h>
 #import "AVConstants.h"
 #import "AVQuery.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const kAVPushTargetPlatformIOS;
 extern NSString *const kAVPushTargetPlatformAndroid;
@@ -19,16 +20,20 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
  The preferred way of modifying or retrieving channel subscriptions is to use
  the AVInstallation class, instead of the class methods in AVPush.
 
- This class is currently for iOS only. AVOS Cloud does not handle Push Notifications
- to AVOS Cloud applications running on OS X. Push Notifications can be sent from OS X
+ This class is currently for iOS only. LeanCloud does not handle Push Notifications
+ to LeanCloud applications running on OS X. Push Notifications can be sent from OS X
  applications via Cloud Code or the REST API to push-enabled devices (e.g. iOS
  or Android).
  */
 @interface AVPush : NSObject
 
 /*! @name Creating a Push Notification */
-+ (AVPush *)push;
 
+/**
+ *  创建一个 AVPush 对象
+ *  @return AVPush 对象
+ */
++ (instancetype)push;
 /**
  *  Set call what production mode's cloud code
  *
@@ -110,7 +115,7 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
  *
  *  @param dateToPush   Defaults is now.
  */
-- (void)setPushDate:(NSDate*)dateToPush;
+- (void)setPushDate:(NSDate *)dateToPush;
 
 
 /*!
@@ -127,7 +132,7 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
  Sets the time interval after which this notification should expire.
  This notification will be sent to devices which are either online at
  the time the notification is sent, or which come online within the given
- time interval of the notification being received by AVOS Cloud server.
+ time interval of the notification being received by LeanCloud server.
  An interval which is less than or equal to zero indicates that the
  message should only be sent to devices which are currently online.
  @param timeInterval The interval after which the notification should expire.
@@ -227,6 +232,12 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
 - (BOOL)sendPush:(NSError **)error;
 
 /*!
+ An alias of `-[AVPush sendPush:]` methods that supports Swift exception.
+ @seealso `-[AVPush sendPush:]`
+ */
+- (BOOL)sendPushAndThrowsWithError:(NSError **)error;
+
+/*!
  Asynchronously send this push message.
  */
 - (void)sendPushInBackground;
@@ -324,25 +335,17 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
 /*! @name Handling Notifications */
 
 /*!
- A default handler for push notifications while the app is active to mimic the behavior of iOS push notifications while the app is backgrounded or not running. Call this from didReceiveRemoteNotification.
- @param userInfo The userInfo dictionary you get in didReceiveRemoteNotification.
- */
-+ (void)handlePush:(NSDictionary *)userInfo;
-
-/*! @name Managing Channel Subscriptions */
-
-/*!
- Store the device token locally for push notifications. Usually called from you main app delegate's didRegisterForRemoteNotificationsWithDeviceToken.
- @param deviceToken Either as an NSData straight from didRegisterForRemoteNotificationsWithDeviceToken or as an NSString if you converted it yourself.
- */
-+ (void)storeDeviceToken:(id)deviceToken;
-
-/*!
  Get all the channels that this device is subscribed to.
  @param error Pointer to an NSError that will be set if necessary.
  @return an NSSet containing all the channel names this device is subscribed to.
  */
-+ (NSSet *)getSubscribedChannels:(NSError **)error;
++ (nullable NSSet *)getSubscribedChannels:(NSError **)error;
+
+/*!
+ An alias of `-[AVPush getSubscribedChannels:]` methods that supports Swift exception.
+ @seealso `-[AVPush getSubscribedChannels:]`
+ */
++ (nullable NSSet *)getSubscribedChannelsAndThrowsWithError:(NSError **)error;
 
 /*!
  Get all the channels that this device is subscribed to.
@@ -354,7 +357,6 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
  Asynchronously get all the channels that this device is subscribed to.
  @param target The object to call selector on.
  @param selector The selector to call. It should have the following signature: (void)callbackWithResult:(NSSet *)result error:(NSError *)error. error will be nil on success and set if there was an error.
- @return an NSSet containing all the channel names this device is subscribed to.
  */
 + (void)getSubscribedChannelsInBackgroundWithTarget:(id)target
                                            selector:(SEL)selector;
@@ -429,3 +431,5 @@ extern NSString *const kAVPushTargetPlatformWindowsPhone;
                                   selector:(SEL)selector;
 
 @end
+
+NS_ASSUME_NONNULL_END
