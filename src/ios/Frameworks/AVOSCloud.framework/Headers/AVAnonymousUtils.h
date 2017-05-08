@@ -1,6 +1,6 @@
 //
 //  AVAnonymousUtils.h
-//  AVOS Cloud
+//  LeanCloud
 //
 //  Created by Zhu Zeng on 6/20/13.
 //  Copyright (c) 2013 AVOS. All rights reserved.
@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "AVUser.h"
 #import "AVConstants.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /*!
  Provides utility functions for working with Anonymously logged-in users.  Anonymous users have some unique characteristics:
@@ -55,3 +57,5 @@
 + (BOOL)isLinkedWithUser:(AVUser *)user;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
-  id="cordova-plugin-leanpush" version="0.3.4">
+  id="cordova-plugin-leancloud" version="0.3.4">
   <name>Cordova LeanCloud Push</name>
   <js-module src="www/LeanPush.js" name="LeanPush">
     <clobbers target="LeanPush"/>
@@ -50,11 +50,11 @@
   <platform name="android">
     <config-file parent="/*" target="res/xml/config.xml">
       <feature name="LeanPush">
-        <param name="android-package" value="me.xyzhang.cordova.leanpush.LeanPush"/>
+        <param name="android-package" value="leancloud.cordova.leanpush.LeanPush"/>
         <param name="onload" value="true" />
       </feature>
       <feature name="LeanAnalytics">
-        <param name="android-package" value="me.xyzhang.cordova.leanpush.LeanAnalytics"/>
+        <param name="android-package" value="leancloud.cordova.leanpush.LeanAnalytics"/>
       </feature>
       <preference name="leancloud-appid" value="$LEAN_APP_ID"/>
       <preference name="leancloud-appkey" value="$LEAN_APP_KEY"/>
@@ -78,15 +78,19 @@
       <meta-data android:name="leancloud" android:value="LeanCloud"/>
     </config-file>
     <config-file parent="/*" target="AndroidManifest.xml"/>
-    <source-file src="src/android/LeanApplication.java" target-dir="src/me/xyzhang/cordova/leanpush"/>
-    <source-file src="src/android/LeanPush.java" target-dir="src/me/xyzhang/cordova/leanpush"/>
-    <source-file src="src/android/LeanAnalytics.java" target-dir="src/me/xyzhang/cordova/leanpush"/>
-    <source-file src="src/android/leancloud/Java-WebSocket-1.2.0-leancloud.jar" target-dir="libs" framework="true"/>
-    <source-file src="src/android/leancloud/android-async-http-1.4.6.jar" target-dir="libs" framework="true"/>
-    <source-file src="src/android/leancloud/avoscloud-push-v3.3.jar" target-dir="libs" framework="true"/>
-    <source-file src="src/android/leancloud/avoscloud-sdk-v3.3.jar" target-dir="libs" framework="true"/>
-    <source-file src="src/android/leancloud/avoscloud-statistics-v3.3.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/LeanApplication.java" target-dir="src/leancloud/cordova/leanpush"/>
+    <source-file src="src/android/LeanPush.java" target-dir="src/leancloud/cordova/leanpush"/>
+    <source-file src="src/android/LeanAnalytics.java" target-dir="src/leancloud/cordova/leanpush"/>
+    <source-file src="src/android/leancloud/avoscloud-mixpush-v3.16.2.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/avoscloud-push-v3.16.2.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/avoscloud-sdk-v3.16.2.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/avoscloud-statistics-v3.16.2.jar" target-dir="libs" framework="true"/>
     <source-file src="src/android/leancloud/fastjson.jar" target-dir="libs" framework="true"/>
-    <source-file src="src/android/leancloud/httpmime-4.2.4.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/HwPush_SDK_V2705.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/Java-WebSocket-1.3.2-leancloud.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/MiPush_SDK_Client_3_2_2.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/okhttp-2.6.0-leancloud.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/okio-1.6.0-leancloud.jar" target-dir="libs" framework="true"/>
+    <source-file src="src/android/leancloud/protobuf-java-2.6.1.jar" target-dir="libs" framework="true"/>
   </platform>
 </plugin>

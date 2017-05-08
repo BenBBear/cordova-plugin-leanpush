@@ -1,4 +1,4 @@
-package me.xyzhang.cordova.leanpush;
+package leancloud.cordova.leanpush;
 
 import java.util.Arrays;
 import java.util.ArrayList;

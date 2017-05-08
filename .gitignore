@@ -1,3 +1,4 @@
 .DS_Store
 .tern_port
 /node_modules/
+.vscode

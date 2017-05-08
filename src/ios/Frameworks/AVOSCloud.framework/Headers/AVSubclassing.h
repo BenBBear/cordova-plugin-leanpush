@@ -10,8 +10,10 @@
 
 @class AVQuery;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
- If a subclass of AVObject conforms to AVSubclassing and calls registerSubclass, AVOS Cloud will be able to use that class as the native class for a AVOS Cloud object.
+ If a subclass of AVObject conforms to AVSubclassing and calls registerSubclass, LeanCloud will be able to use that class as the native class for a LeanCloud object.
 
  Classes conforming to this protocol should subclass AVObject and include AVObject+Subclass.h in their implementation file. This ensures the methods in the Subclass category of AVObject are exposed in its subclasses only.
  */
@@ -50,9 +52,11 @@
 + (AVQuery *)query;
 
 /*!
- Lets AVOS Cloud know this class should be used to instantiate all objects with class type parseClassName.
+ Lets LeanCloud know this class should be used to instantiate all objects with class type parseClassName.
  This method must be called before [AVOSCloud setApplicationId:clientKey:]
  */
 + (void)registerSubclass;
 
 @end
+
+NS_ASSUME_NONNULL_END

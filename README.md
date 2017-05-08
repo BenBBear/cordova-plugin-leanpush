@@ -1,97 +1,124 @@
 cordova-plugin-leanpush
 ========================
 
-Cordova plugin for [LeanCloud](https://leancloud.cn) push notification
+基于 LeanCloud 推送和统计的 Cordova 插件
+
+## 安装
 
 
-
-## Installation
-
-
-- Fetch from cordova npm
+### 从源代码安装
 
 ```shell
- cordova plugin add cordova-plugin-leanpush  --variable LEAN_APP_ID=<YOUR_LEANCOULD_APP_ID> --variable LEAN_APP_KEY=<YOUR_LEANCOULD_APP_KEY>
+cordova plugin add https://github.com/wujun4code/cordova-plugin-leanpush.git  --variable LEAN_APP_ID=<你的 App Id> --variable LEAN_APP_KEY=<你的 App Key> --save
 ```
 
 
-
-
-- Add this to your `gulpfile.js`
+在 `gulpfile.js` 里面添加如下代码：
 
 ```js
+var leancloudInstaller = require('./plugins/cordova-plugin-leancloud/lpush-installer');
+
 gulp.task('lpush-install', function(done){
-    require('./plugins/cordova-plugin-leanpush/lpush-installer.js')(__dirname, done);
+    leancloudInstaller(__dirname, done);
 });
 ```
 
-- `npm install --save-dev xml2js thunks && npm install`
+然后安装如下 2 个组件
 
-- Then exectue this gulp task by running `gulp lpush-install` in shell.
+```shell
+npm install --save-dev xml2js thunks && npm install
+```
 
-- Done.
+最后执行以下 gulp 任务：
 
-### Known Android Build Issue
+```shell
+gulp lpush-install
+```
 
-See [Attention/Android Build Issue](#android-build-issue)
+完成
 
+## 使用
 
+### 初始化
 
-## Usage
-
-### Init
-
-
-Put the initialization Code in your "deviceReady" Code Block (like $ionicPlatform.ready)
+在 "deviceReady" 方法中初始化 LeanCloud(比如 $ionicPlatform.ready)
 
 ```js
 window.LeanPush.init();
 ```
 
-<!-- The Init accepts a optional function as the callback when the notification recieves *(If provided, it will call onNotificationReceived on this function)*. -->
+### 推送相关文档
+Leancloud Push 开发指南](https://leancloud.cn/docs/ios_push_guide.html).
 
-
-
-### Push Related API
-
-
-Coresponding to the [Leancloud Push documentation](https://leancloud.cn/docs/ios_push_guide.html).
-
+#### 初始化接口
 ```js
-
 window.LeanPush.subscribe(channel, success, error)  // 订阅频道 channel :string 
 window.LeanPush.unsubscribe(channel, success, error) //退订频道 channel :string
 window.LeanPush.clearSubscription(success, error) //退订所有频道 
+```
 
-window.LeanPush.getInstallation(success, error)  //Installation 表示一个允许推送的设备的唯一标示, 对应数据管理平台中的 _Installation 表
-// success callback:
-// function(data){
-//   data = {
-//        'deviceType':'android' or 'ios',
-//        'installationId': 'android installation id' or 'ios deviceToken'
-//        'deviceToken':    'ios deviceToken' or 'android installation id'
-//   }
-// }
+#### 注册 Installation 
+一个 Installation 对象对应着一台设备，iOS 设备第一次启动 app 的时候会弹出提示，是否允许当前 app 使用推送，当用户点击 「允许」 之后，LeanCloud SDK 就会注册一个 iOS 设备推送的 DeviceToken 并且将它存储在 `_Installation` 表里。
 
+```js
+window.LeanPush.getInstallation(function(data){
+      data = {        
+          'deviceType':'android' or 'ios',
+          'installationId': 'android installation id' or 'ios deviceToken'// `installationId` 是保存之后从服务端返回的当前设备对应的 installation 表里面的 `objectId`
+          'deviceToken':    'ios deviceToken' or 'android installation id'
+     }
+}, function(error) {
+}); 
+```
 
-window.LeanPush.onNotificationReceived(callback) // 一个notification到来的回调函数
-// callback:
-// function(notice){
-//  notice = {
-//     'prevAppState': 'background' or 'foreground' or 'closed',
+#### 接受推送消息
 
-//      push到来的时候上一个App状态:
-//      android只有 'background' 和 'closed', 因为android所有push都要点击
-//      ios都有，因为ios如果app在前台，系统推送的alert不会出现
-//      用户没有任何操作，app就自动执行notification的函数不好, 可以加个判断
+```js
+window.LeanPush.onNotificationReceived(function(data){
+   data = {
+       "alert":             "消息内容",
+       "category":          "通知分类名称",
+       "badge":             "未读消息数目",
+       "sound":             "声音文件名",
+       "content-available": "如果你在使用 Newsstand，设置为 1 来开始一次后台下载",
+       "prevAppState": 'background' or 'foreground' or 'closed'
+       // push到来的时候上一个App状态:
+       // android只有 'background' 和 'closed', 因为android所有push都要点击
+       // ios都有，因为ios如果app在前台，系统推送的alert不会出现
+       // 用户没有任何操作，app就自动执行notification的函数不好, 可以加个判断
+   };
+}); 
+```
 
-//     'alert':'Notice Text',
-//     'file_url':'Push File',
-//     'key':'value'   if you send JSON Type Push, they will map to here.
-//   }
-// }
+假设服务端推送的格式如下：
+
+```json
+{
+  "alert":             "消息内容",
+  "category":          "通知分类名称",
+  "badge":             "未读消息数目",
+  "sound":             "声音文件名",
+  "content-available": "如果你在使用 Newsstand，设置为 1 来开始一次后台下载"
+}
+```
+
+客户端接收的格式如下：
+
+```json
+{
+  "alert":             "消息内容",
+  "category":          "通知分类名称",
+  "badge":             "未读消息数目",
+  "sound":             "声音文件名",
+  "content-available": "如果你在使用 Newsstand，设置为 1 来开始一次后台下载"
+  "prevAppState": 'background' or 'foreground' or 'closed'
+}
+```
+
+注：针对 iOS 特殊的接收格式在接收之后做了解包处理，保证和 Android 接收的格式是一样的。因此在  `window.LeanPush.onNotificationReceived(callback)` 可以统一处理格式，无需再判断 deviceType 是 iOS 而做特殊处理。
     
 
+```
 $rootScope.$on('leancloud:notificationReceived', callback) // 如果你用了angular， 一个notification会在scope上broadcast这个event
 // callback:
 // function(event, notice){
@@ -99,35 +126,23 @@ $rootScope.$on('leancloud:notificationReceived', callback) // 如果你用了ang
 // }
 ```
 
-Many Thanks to [Derek Hsu](https://github.com/Hybrid-Force) XD 😁
+感谢 [Derek Hsu](https://github.com/Hybrid-Force) 
 
 
 
+### 数据统计与分析 API
 
-### About Sending Push
-
-Use the [JS API: AV.Push](https://leancloud.cn/docs/js_guide.html#Push_通知) that leancloud provide.
-
+可以参考 [https://github.com/Hybrid-Force/cordova-plugin-leancloud](https://github.com/Hybrid-Force/cordova-plugin-leancloud).
 
 
-### LeanAnalytics API
 
-Corresponding code is forked from [https://github.com/Hybrid-Force/cordova-plugin-leancloud](https://github.com/Hybrid-Force/cordova-plugin-leancloud).
+- 关于统计部分的使用可以参考：[https://github.com/BenBBear/cordova-plugin-leanpush/blob/master/www/LeanAnalytics.js](https://github.com/BenBBear/cordova-plugin-leanpush/blob/master/www/LeanAnalytics.js) I
 
-
-Only a novice for leancloud I am, so
-
-- take a look at the source code [https://github.com/BenBBear/cordova-plugin-leanpush/blob/master/www/LeanAnalytics.js](https://github.com/BenBBear/cordova-plugin-leanpush/blob/master/www/LeanAnalytics.js) to know the API
-
-- and study the [Leancloud documentation about leanAnalytics](https://leancloud.cn/docs/ios_statistics.html)
-
-is the better way to go.
-
-
+- 文档地址 [Leancloud documentation about leanAnalytics](https://leancloud.cn/docs/ios_statistics.html)
 
 ---
 
-## Screen Recording
+## 截屏效果图
 
 ### Android
 ![](./img/android.gif)
@@ -151,18 +166,8 @@ See the [Attention Below](#attention), the webview can't `alert` when `onResume`
 
 ![](./img/ios-back-phone.gif)
 
-##### console.log
 
-![](./img/ios-back.gif)
-
-The debugger in screenshot is [GapDebug](https://www.genuitec.com/products/gapdebug/), debug phonegap in browser :D
-
-
-
-
-
-
-## Behavior
+## 行为
 
 The `onNotificationReceived callback`  and the `$rootScope.$emit('leancloud:notificationReceived')` will fires when
 
@@ -181,18 +186,16 @@ The `onNotificationReceived callback`  and the `$rootScope.$emit('leancloud:noti
 
 
 
-## Attention
+## 注意
 
 ### Android Quirk
 
-In order to receive push from android, I change the default `MainActivity` and `Application Entry`  in that gulp task. Details in the [lpush_installer.js](https://github.com/BenBBear/cordova-plugin-leanpush/blob/master/lpush-installer.js).
-
-> So if you use another plugin that also goes this way, then there gonna be conflicts.
+请确保一定要先执行 gulp 任务： lpush_installer.js
 
 
-#### Uninstall
+#### 卸载
 
-For fully uninstallation:
+执行如下脚本：
 
 ```shell
 cordova plugin rm cordova-plugin-leanpush
@@ -200,22 +203,9 @@ ionic platform rm android && ionic platform rm ios
 ionic platform add android && ionic platform add ios
 ```
 
-### Don't Use Alert in the IOS inside Notification Callback
+### 通知处理
 
-> `alert` is a blocking function.
-
-#### IOS UIWebView
-
-It will cause the app to freeze when you resume the app by clicking notification. (but it seems ok when the app is in the foreground or closed.)
-
-###  For Android
-
-As far as I try, `alert` is fine, guess is the difference of webView between  IOS and android.
-
-
-### Notification Handler
-
-There are two ways, both will be fired when notification comes
+以下两种方法都可以获取通知：
 
 - `onNotificationReceived`
 
@@ -225,14 +215,11 @@ There are two ways, both will be fired when notification comes
 You can choose one of them, but may not both.
 
 
-###  Android Build Issue
+###  Android 编译常见问题
 
 - **Error: duplicate files during packaging of APK**
 
-**How to Solve:**
-
-
-insert following code into the **android tag** of `platforms/android/build.gradle`
+在 `platforms/android/build.gradle` 找到 `android` 标签，然后添加如下内容：
 
 ```groovy
  packagingOptions {
@@ -241,7 +228,7 @@ insert following code into the **android tag** of `platforms/android/build.gradl
 }
 ```
 
-It should look like below
+使其内容如下：
 
 ```groovy
 android{
@@ -249,14 +236,12 @@ android{
        exclude 'META-INF/LICENSE.txt'
  	   exclude 'META-INF/NOTICE.txt'
    }
-    //stuff
+    //其他 gradle 的设置
 }
 ```
-
-
 
 ## LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Xinyu Zhang, Derek Hsu
+Copyright (c) 2015 Xinyu Zhang, Derek Hsu,Wu Jun

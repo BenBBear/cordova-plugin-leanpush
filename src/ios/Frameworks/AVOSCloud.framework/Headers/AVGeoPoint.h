@@ -1,12 +1,14 @@
 //
 //  AVGeoPoint.h
-//  AVOS Cloud
+//  LeanCloud
 //
 
 
 #import <Foundation/Foundation.h>
 
 @class CLLocation;
+
+NS_ASSUME_NONNULL_BEGIN
 
 /*!
  Object which may be used to embed a latitude / longitude point as the value for a key in a AVObject.
@@ -24,7 +26,7 @@
  Create a AVGeoPoint object.  Latitude and longitude are set to 0.0.
  @return a new AVGeoPoint.
  */
-+ (AVGeoPoint *)geoPoint;
++ (instancetype)geoPoint;
 
 /*!
  Creates a new AVGeoPoint object for the given CLLocation, set to the location's
@@ -32,7 +34,7 @@
  @param location CLLocation object, with set latitude and longitude.
  @return a new AVGeoPoint at specified location.
  */
-+ (AVGeoPoint *)geoPointWithLocation:(CLLocation *)location;
++ (instancetype)geoPointWithLocation:(CLLocation *)location;
 
 /*!
  Creates a new AVGeoPoint object with the specified latitude and longitude.
@@ -40,15 +42,17 @@
  @param longitude Longitude of point in degrees.
  @return New point object with specified latitude and longitude.
  */
-+ (AVGeoPoint *)geoPointWithLatitude:(double)latitude longitude:(double)longitude;
++ (instancetype)geoPointWithLatitude:(double)latitude longitude:(double)longitude;
 
+#if AV_IOS_ONLY
 /*!
  Fetches the user's current location and returns a new AVGeoPoint object via the
  provided block.
  @param geoPointHandler A block which takes the newly created AVGeoPoint as an
  argument.
  */
-+ (void)geoPointForCurrentLocationInBackground:(void(^)(AVGeoPoint *geoPoint, NSError *error))geoPointHandler;
++ (void)geoPointForCurrentLocationInBackground:(void(^)(AVGeoPoint * _Nullable geoPoint, NSError * _Nullable error))geoPointHandler;
+#endif
 
 /** @name Controlling Position */
 
@@ -82,3 +86,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END
